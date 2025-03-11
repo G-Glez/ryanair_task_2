@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: task2
+  webflux:
+    base-path: /api
+
+server:
+  port: 8080
+
+external-api:
+  url: https://services-api.ryanair.com
+  connectTimeout: 5000
+  responseTimeout: 10000
