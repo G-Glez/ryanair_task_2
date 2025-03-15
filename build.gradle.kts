@@ -23,13 +23,21 @@ repositories {
     mavenCentral()
 }
 
+val caffeineVersion = "3.2.0"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
+
     compileOnly("org.projectlombok:lombok")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     annotationProcessor("org.projectlombok:lombok")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

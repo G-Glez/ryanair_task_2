@@ -2,11 +2,11 @@ package com.ryanair.task2.datasource.impl;
 
 import com.ryanair.task2.datasource.ScheduleDataSource;
 import com.ryanair.task2.dto.api.ScheduleApiDTO;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@Component
+@Service
 public class ScheduleDataSourceImpl implements ScheduleDataSource {
     private final WebClient webClient;
 
@@ -15,11 +15,13 @@ public class ScheduleDataSourceImpl implements ScheduleDataSource {
     }
 
     @Override
-    public Flux<ScheduleApiDTO> getSchedules(int timetable, String departure, String arrival, int year, int month) {
+    public Mono<ScheduleApiDTO> getSchedules(int timetable, String departure, String arrival, int year, int month) {
+        final String URL = "https://services-api.ryanair.com/timtbl/{timetable}/schedules/{departure}/{arrival}/years/{year}/months/{month}";
+
         return webClient
                 .get()
-                .uri("https://services-api.ryanair.com/timtbl/{timtbl}/schedules/{departure}/{arrival}/years/{year}/months/{month}", timetable, departure, arrival, year, month)
+                .uri(URL, timetable, departure, arrival, year, month)
                 .retrieve()
-                .bodyToFlux(ScheduleApiDTO.class);
+                .bodyToMono(ScheduleApiDTO.class);
     }
 }

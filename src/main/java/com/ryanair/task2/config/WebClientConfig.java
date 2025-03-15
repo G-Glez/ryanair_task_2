@@ -1,6 +1,7 @@
 package com.ryanair.task2.config;
 
 import io.netty.channel.ChannelOption;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import java.time.Duration;
 
 @Configuration
 @ConfigurationProperties(prefix = "external-api")
+@Setter
 public class WebClientConfig {
     private String url;
     private int connectTimeout;

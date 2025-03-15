@@ -1,5 +1,6 @@
 package com.ryanair.task2.api.controllers;
 
+import com.ryanair.task2.domain.services.FlightService;
 import com.ryanair.task2.dto.output.InterconnectionDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
@@ -14,6 +15,11 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/interconnections")
 public class InterconnectionController {
+    private final FlightService flightService;
+
+    public InterconnectionController(FlightService flightService) {
+        this.flightService = flightService;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<InterconnectionDTO> getInterconnections(
@@ -25,6 +31,6 @@ public class InterconnectionController {
             LocalDateTime departureDateTime,
             @RequestParam("arrivalDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime arrivalDateTime) {
-        return null;
+        return flightService.getInterconnections(departure, arrival, departureDateTime, arrivalDateTime);
     }
 }
