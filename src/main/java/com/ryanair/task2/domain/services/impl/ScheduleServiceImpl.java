@@ -26,13 +26,23 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Flux<List<Schedule>> getSchedulesFromItinerary(List<String> itinerary, LocalDateTime departureTime, LocalDateTime arrivalTime, int transferTime) {
-        return Flux.fromIterable(ScheduleServiceUtils.getItinerarySteps(itinerary))
+        List<List<String>> steps = getItinerarySteps(itinerary);
+
+        return Flux.fromIterable(steps)
                 .flatMap(step -> potentialSchedulesByStep(step, departureTime, arrivalTime).collectList())
                 .buffer()
-                .flatMap(schedulesBySteps -> Flux.fromStream(ScheduleServiceUtils.computeLegSchedules(schedulesBySteps).stream()
-                        .filter(schedules -> ScheduleServiceUtils.checkValidItineraryTransferTime(schedules, transferTime))));
+                .flatMap(schedulesBySteps -> Flux.fromStream(computeLegSchedules(schedulesBySteps).stream()
+                        .filter(schedules -> checkValidItineraryTransferTime(schedules, transferTime))));
     }
 
+    /**
+     * Get the potential schedules for a step in an itinerary
+     *
+     * @param step list of airport codes in the step (2 elements)
+     * @param departureTime departure time
+     * @param arrivalTime arrival time
+     * @return flux of potential schedules
+     */
     private Flux<Schedule> potentialSchedulesByStep(List<String> step, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         final int TIMETABLE = 3;
 
@@ -41,20 +51,40 @@ public class ScheduleServiceImpl implements ScheduleService {
         return Flux.fromIterable(monthsToRequest)
                 .flatMap(date -> scheduleDataSource.getSchedules(TIMETABLE, step.getFirst(), step.getLast(), date.getYear(), date.getMonthValue())
                         .flatMapMany(dto -> Flux.fromIterable(Mappers.scheduleApiDTOToSchedule(dto, date.getYear()))))
-                .filter(schedule -> ScheduleServiceUtils.checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime));
+                .filter(schedule -> checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime));
     }
-}
 
-class ScheduleServiceUtils {
+    /**
+     * Check if the transfer time between flights in a list of schedules is valid
+     * @param schedules list of schedules
+     * @param transferTime transfer time between flights
+     * @return true if the transfer time is valid, false otherwise
+     */
     public static boolean checkValidItineraryTransferTime(List<Schedule> schedules, int transferTime) {
         return IntStream.range(0, schedules.size() - 1)
                 .allMatch(i -> schedules.get(i).getArrivalTime().plusHours(transferTime).isBefore(schedules.get(i + 1).getDepartureTime()));
     }
 
+    /**
+     * Check if the departure and arrival time of a schedule are valid
+     * Arrival time must be before the arrival time and departure time must be after the departure time
+     *
+     * @param schedules schedule
+     * @param departureTime departure time
+     * @param arrivalTime arrival time
+     * @return true if the departure and arrival time are valid, false otherwise
+     */
     public static boolean checkValidDepartureAndArrivalTime(Schedule schedules, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         return schedules.getDepartureTime().isAfter(departureTime) && schedules.getArrivalTime().isBefore(arrivalTime);
     }
 
+    /**
+     * Compute all the possible schedules for a step in an itinerary
+     * This possible schedules are calculated as the cartesian product of the schedules of the step
+     *
+     * @param potentialSchedules list of schedules for an itinerary
+     * @return list of possible schedules
+     */
     public static List<List<Schedule>> computeLegSchedules(List<List<Schedule>> potentialSchedules) {
         if (potentialSchedules.isEmpty()) {
             return Collections.emptyList();
@@ -80,13 +110,16 @@ class ScheduleServiceUtils {
                 );
     }
 
+    /**
+     * Get the steps of an itinerary
+     *
+     * @param itinerary list of airport codes in the itinerary
+     * @return list of steps
+     */
     public static List<List<String>> getItinerarySteps(List<String> itinerary) {
         return IntStream
                 .range(0, itinerary.size() - 1)
                 .mapToObj(i -> Stream.of(itinerary.get(i), itinerary.get(i + 1)).toList())
                 .toList();
-    }
-
-    private ScheduleServiceUtils() {
     }
 }

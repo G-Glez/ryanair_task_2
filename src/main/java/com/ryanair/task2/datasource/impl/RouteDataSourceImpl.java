@@ -12,15 +12,19 @@ import java.time.Duration;
 
 @Service
 public class RouteDataSourceImpl implements RouteDataSource {
+    static final String BASE_URL = "https://services-api.ryanair.com";
+
     private final WebClient webClient;
 
     public RouteDataSourceImpl(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.build();
+        this.webClient = webClientBuilder
+                .baseUrl(BASE_URL)
+                .build();
     }
 
     @Override
     public Flux<RouteApiDTO> getRoutes(int locale) {
-        final String URL = "https://services-api.ryanair.com/views/locate/{locale}/routes";
+        final String URL = "/views/locate/{locale}/routes";
 
         return webClient
                 .get()

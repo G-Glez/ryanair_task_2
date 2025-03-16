@@ -71,9 +71,7 @@ class ScheduleServiceImplTest {
                 });
 
     }
-}
 
-class ScheduleServiceUtilsTest {
     @DisplayName("Test for ScheduleServiceUtils.checkValidItineraryTransferTime")
     @Test
     void testCheckValidTransferTime() {
@@ -90,8 +88,8 @@ class ScheduleServiceUtilsTest {
                 new Schedule(LocalDateTime.of(2025, 1, 1, 1, 59), LocalDateTime.of(2025, 1, 1, 1, 59))
         );
 
-        assertTrue(ScheduleServiceUtils.checkValidItineraryTransferTime(validItinerarySchedules, 2));
-        assertFalse(ScheduleServiceUtils.checkValidItineraryTransferTime(invalidItinerarySchedules, 2));
+        assertTrue(ScheduleServiceImpl.checkValidItineraryTransferTime(validItinerarySchedules, 2));
+        assertFalse(ScheduleServiceImpl.checkValidItineraryTransferTime(invalidItinerarySchedules, 2));
     }
 
     @DisplayName("Test for ScheduleServiceUtils.checkValidDepartureAndArrivalTime")
@@ -106,8 +104,8 @@ class ScheduleServiceUtilsTest {
                 new Schedule(departureTime.minus(Duration.ofHours(2)), arrivalTime.plus(Duration.ofHours(2)))
         );
 
-        assertTrue(ScheduleServiceUtils.checkValidDepartureAndArrivalTime(validSchedule, departureTime, arrivalTime));
-        invalidSchedules.forEach(schedule -> assertFalse(ScheduleServiceUtils.checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime)));
+        assertTrue(ScheduleServiceImpl.checkValidDepartureAndArrivalTime(validSchedule, departureTime, arrivalTime));
+        invalidSchedules.forEach(schedule -> assertFalse(ScheduleServiceImpl.checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime)));
     }
 
     @DisplayName("Test for ScheduleServiceUtils.computeLegSchedules")
@@ -145,7 +143,7 @@ class ScheduleServiceUtilsTest {
                         schedule4)
         );
 
-        List<List<Schedule>> result = ScheduleServiceUtils.computeLegSchedules(potentialSchedules);
+        List<List<Schedule>> result = ScheduleServiceImpl.computeLegSchedules(potentialSchedules);
 
         assertEquals(expectedResult, result);
     }
@@ -161,7 +159,7 @@ class ScheduleServiceUtilsTest {
                 List.of("C", "D")
         );
 
-        List<List<String>> result = ScheduleServiceUtils.getItinerarySteps(itinerary);
+        List<List<String>> result = ScheduleServiceImpl.getItinerarySteps(itinerary);
 
         assertEquals(expectedSteps, result);
     }

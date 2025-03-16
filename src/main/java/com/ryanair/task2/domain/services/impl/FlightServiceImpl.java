@@ -29,11 +29,12 @@ public class FlightServiceImpl implements FlightService {
         final int TRANSFER_TIME = 2;
 
         return routeService.getItineraries(departure, arrival, MAX_STOPS, VALID_OPERATOR)
-                .flatMap(itinerary -> scheduleService.getSchedulesFromItinerary(itinerary, departureDateTime, arrivalDateTime, TRANSFER_TIME)
-                        .map(schedules -> {
-                            InterconnectionDTO.LegDTO[] legs = getLegs(itinerary, schedules);
-                            return new InterconnectionDTO(itinerary.size() - 1, legs);
-                        }))
+                .flatMap(itinerary ->
+                        scheduleService.getSchedulesFromItinerary(itinerary, departureDateTime, arrivalDateTime, TRANSFER_TIME)
+                                .map(schedules -> {
+                                    InterconnectionDTO.LegDTO[] legs = getLegs(itinerary, schedules);
+                                    return new InterconnectionDTO(itinerary.size() - 2, legs);
+                                }))
                 .collectList()
                 .flatMapMany(Flux::fromIterable);
     }

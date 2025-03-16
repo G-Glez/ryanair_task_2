@@ -14,7 +14,14 @@ public class RouteGraphNode {
         this.connectedNodes = new HashSet<>();
     }
 
-    public List<List<String>> getItineraries(String arrivalAirportIATACode, int stops) {
+    /**
+     * Get all possible itineraries from this airport to the arrival airport with a maximum number of stops
+     *
+     * @param arrivalAirportIATACode The arrival airport IATA code
+     * @param maxStops The maximum number of stops
+     * @return A list of itineraries
+     */
+    public List<List<String>> getItineraries(String arrivalAirportIATACode, int maxStops) {
         if(airportIATACode.equals(arrivalAirportIATACode)) {
             return Collections.emptyList();
         }
@@ -24,11 +31,21 @@ public class RouteGraphNode {
         Set<RouteGraphNode> visitedNode = new HashSet<>();
 
         currentItinerary.add(this.airportIATACode);
-        dfs(this, arrivalAirportIATACode, stops + 2, currentItinerary, itineraries, visitedNode);
+        dfs(this, arrivalAirportIATACode, maxStops + 2, currentItinerary, itineraries, visitedNode);
 
         return itineraries;
     }
 
+    /**
+     * Depth-first search to find all possible itineraries from the current airport to the arrival airport
+     *
+     * @param current The current airport
+     * @param arrival The arrival airport
+     * @param remainingStops The remaining number of stops
+     * @param currentPath The current itinerary
+     * @param paths The list of itineraries
+     * @param visited The set of visited airports
+     */
     private void dfs(RouteGraphNode current, String arrival, int remainingStops,
                      List<String> currentPath, List<List<String>> paths, Set<RouteGraphNode> visited) {
         if (remainingStops == 0) return;
