@@ -9,13 +9,11 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ScheduleDataSourceImpl implements ScheduleDataSource {
-    static final String BASE_URL = "https://services-api.ryanair.com";
 
     private final WebClient webClient;
 
     public ScheduleDataSourceImpl(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl(BASE_URL)
                 .build();
     }
 

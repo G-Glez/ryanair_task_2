@@ -9,5 +9,9 @@ server:
 
 external-api:
   url: https://services-api.ryanair.com
-  connectTimeout: 500000
-  responseTimeout: 100000
+  connectTimeout: 5000 # in milliseconds
+  responseTimeout: 1000 # in milliseconds
+
+cache:
+    expiration: 30 # in minutes
+    maxSize: 100

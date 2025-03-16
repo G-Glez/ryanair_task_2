@@ -12,13 +12,11 @@ import java.time.Duration;
 
 @Service
 public class RouteDataSourceImpl implements RouteDataSource {
-    static final String BASE_URL = "https://services-api.ryanair.com";
 
     private final WebClient webClient;
 
     public RouteDataSourceImpl(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl(BASE_URL)
                 .build();
     }
 

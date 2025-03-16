@@ -38,25 +38,29 @@ public class ScheduleServiceImpl implements ScheduleService {
     /**
      * Get the potential schedules for a step in an itinerary
      *
-     * @param step list of airport codes in the step (2 elements)
+     * @param step          list of airport codes in the step (2 elements)
      * @param departureTime departure time
-     * @param arrivalTime arrival time
+     * @param arrivalTime   arrival time
      * @return flux of potential schedules
      */
     private Flux<Schedule> potentialSchedulesByStep(List<String> step, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         final int TIMETABLE = 3;
+        // Maximum number of concurrent requests to the schedule data source
+        final int MAX_CONCURRENT_REQUESTS = 5;
 
         List<LocalDate> monthsToRequest = DateUtils.getMonthsBetween(departureTime, arrivalTime);
 
         return Flux.fromIterable(monthsToRequest)
                 .flatMap(date -> scheduleDataSource.getSchedules(TIMETABLE, step.getFirst(), step.getLast(), date.getYear(), date.getMonthValue())
-                        .flatMapMany(dto -> Flux.fromIterable(Mappers.scheduleApiDTOToSchedule(dto, date.getYear()))))
+                                .flatMapMany(dto -> Flux.fromIterable(Mappers.scheduleApiDTOToSchedule(dto, date.getYear()))),
+                        MAX_CONCURRENT_REQUESTS)
                 .filter(schedule -> checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime));
     }
 
     /**
      * Check if the transfer time between flights in a list of schedules is valid
-     * @param schedules list of schedules
+     *
+     * @param schedules    list of schedules
      * @param transferTime transfer time between flights
      * @return true if the transfer time is valid, false otherwise
      */
@@ -69,9 +73,9 @@ public class ScheduleServiceImpl implements ScheduleService {
      * Check if the departure and arrival time of a schedule are valid
      * Arrival time must be before the arrival time and departure time must be after the departure time
      *
-     * @param schedules schedule
+     * @param schedules     schedule
      * @param departureTime departure time
-     * @param arrivalTime arrival time
+     * @param arrivalTime   arrival time
      * @return true if the departure and arrival time are valid, false otherwise
      */
     public static boolean checkValidDepartureAndArrivalTime(Schedule schedules, LocalDateTime departureTime, LocalDateTime arrivalTime) {
