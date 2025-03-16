@@ -2,10 +2,7 @@ package com.ryanair.task2.domain.model;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 public class RouteGraphNode {
@@ -18,6 +15,9 @@ public class RouteGraphNode {
     }
 
     public List<List<String>> getItineraries(String arrivalAirportIATACode, int stops) {
+        if(airportIATACode.equals(arrivalAirportIATACode)) {
+            return Collections.emptyList();
+        }
 
         List<List<String>> itineraries = new ArrayList<>();
         List<String> currentItinerary = new ArrayList<>();
