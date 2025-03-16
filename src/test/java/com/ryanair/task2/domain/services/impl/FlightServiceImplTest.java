@@ -5,6 +5,7 @@ import com.ryanair.task2.domain.services.RouteService;
 import com.ryanair.task2.domain.services.ScheduleService;
 import com.ryanair.task2.dto.output.InterconnectionDTO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,6 +37,7 @@ class FlightServiceImplTest {
         flightServiceImpl = new FlightServiceImpl(routeService, scheduleService);
     }
 
+    @DisplayName("Test for FlightServiceImpl.getInterconnections")
     @Test
     void testGetInterconnections() {
         when(routeService.getItineraries(anyString(), anyString(), anyInt(), anyString()))

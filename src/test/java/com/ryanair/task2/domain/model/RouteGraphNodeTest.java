@@ -1,6 +1,7 @@
 package com.ryanair.task2.domain.model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -34,6 +35,7 @@ class RouteGraphNodeTest {
         nodeE.getConnectedNodes().addAll(List.of(nodeA, nodeC, nodeD, nodeF));
     }
 
+    @DisplayName("Test for RouteGraphNode.getItineraries")
     @Test
     void testGetItinerariesDirectRoute() {
         List<List<String>> itineraries = nodeA.getItineraries("B", 0);
@@ -41,6 +43,7 @@ class RouteGraphNodeTest {
         assertEquals(List.of("A", "B"), itineraries.getFirst());
     }
 
+    @DisplayName("Test for RouteGraphNode.getItineraries same start and end node")
     @Test
     void testGetItinerariesToSameNode() {
         List<List<String>> itinerariesWithNoStops = nodeA.getItineraries("A", 0);
@@ -50,6 +53,7 @@ class RouteGraphNodeTest {
         assertEquals(Collections.emptyList(), itinerariesWithOneStop);
     }
 
+    @DisplayName("Test for RouteGraphNode.getItineraries with one stop")
     @Test
     void testGetItinerariesWithOneStop() {
         List<List<String>> itineraries = nodeA.getItineraries("E", 1);
@@ -66,6 +70,7 @@ class RouteGraphNodeTest {
         }
     }
 
+    @DisplayName("Test for RouteGraphNode.getItineraries with multiple stops")
     @Test
     void testGetItinerariesWithStrops() {
         List<List<String>> itineraries = nodeB.getItineraries("F", 5);
@@ -82,6 +87,7 @@ class RouteGraphNodeTest {
         }
     }
 
+    @DisplayName("Test for RouteGraphNode.getItineraries with no possible route")
     @Test
     void testGetItinerariesNoRoute() {
         List<List<String>> itineraries = nodeA.getItineraries("F", 0);

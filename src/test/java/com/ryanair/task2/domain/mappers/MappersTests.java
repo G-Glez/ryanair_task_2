@@ -4,6 +4,7 @@ import com.ryanair.task2.domain.model.RouteGraphNode;
 import com.ryanair.task2.domain.model.Schedule;
 import com.ryanair.task2.dto.api.RouteApiDTO;
 import com.ryanair.task2.dto.api.ScheduleApiDTO;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -15,9 +16,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MappersTests {
+    @DisplayName("Test for Mappers.routeApiDTOsToRouteGraph")
     @Test
     void testRouteApiDTOsToRouteGraph() {
-        List<RouteApiDTO> routes = getRouteApiDTOS();
+        List<RouteApiDTO> routes = createRouteDTOs();
 
         Map<String, RouteGraphNode> graph = Mappers.routeApiDTOsToRouteGraph(routes);
 
@@ -34,7 +36,7 @@ class MappersTests {
         assertTrue(graph.get("D").getConnectedNodes().isEmpty());
     }
 
-    private static List<RouteApiDTO> getRouteApiDTOS() {
+    private static List<RouteApiDTO> createRouteDTOs() {
         RouteApiDTO routeAB = new RouteApiDTO("A", "B", null, false, false, null, null);
         RouteApiDTO routeAD = new RouteApiDTO("A", "D", null, false, false, null, null);
         RouteApiDTO routeBA = new RouteApiDTO("B", "A", null, false, false, null, null);
@@ -44,6 +46,7 @@ class MappersTests {
         return List.of(routeAB, routeAD, routeBA, routeBC, routeCD);
     }
 
+    @DisplayName("Test for Mappers.routeApiDTOsToRouteGraph with an empty list of routes as input")
     @Test
     void testRouteApiDTOsToRouteGraphWithEmptyRoutes() {
         Map<String, RouteGraphNode> graph = Mappers.routeApiDTOsToRouteGraph(List.of());
@@ -51,9 +54,10 @@ class MappersTests {
         assertTrue(graph.isEmpty());
     }
 
+    @DisplayName("Test for Mappers.scheduleApiDTOToSchedule")
     @Test
     void testScheduleApiDTOToSchedule() {
-        ScheduleApiDTO scheduleApiDTO = getScheduleApiDTO();
+        ScheduleApiDTO scheduleApiDTO = generateScheduleDTO();
 
         List<Schedule> schedules = Mappers.scheduleApiDTOToSchedule(scheduleApiDTO, 2023);
 
@@ -78,7 +82,7 @@ class MappersTests {
                 schedules.get(2).getArrivalTime());
     }
 
-    private static ScheduleApiDTO getScheduleApiDTO() {
+    private static ScheduleApiDTO generateScheduleDTO() {
         ScheduleApiDTO.DayDTO.FlightDTO flight1 = new ScheduleApiDTO.DayDTO.FlightDTO(null, null, LocalTime.of(10, 0), LocalTime.of(12, 0));
         ScheduleApiDTO.DayDTO.FlightDTO flight2 = new ScheduleApiDTO.DayDTO.FlightDTO(null, null, LocalTime.of(14, 0), LocalTime.of(16, 0));
         ScheduleApiDTO.DayDTO.FlightDTO flight3 = new ScheduleApiDTO.DayDTO.FlightDTO(null, null, LocalTime.of(15, 0), LocalTime.of(18, 0));
@@ -87,6 +91,7 @@ class MappersTests {
         return new ScheduleApiDTO(5, new ScheduleApiDTO.DayDTO[]{day1, day2});
     }
 
+    @DisplayName("Test for Mappers.scheduleApiDTOToSchedule with an empty list of schedules as input")
     @Test
     void testScheduleApiDTOToScheduleWithEmptyFlights() {
         ScheduleApiDTO scheduleApiDTO = new ScheduleApiDTO(5, new ScheduleApiDTO.DayDTO[0]);

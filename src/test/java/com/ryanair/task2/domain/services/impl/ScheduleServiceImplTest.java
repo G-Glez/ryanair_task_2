@@ -5,6 +5,7 @@ import com.ryanair.task2.datasource.ScheduleDataSource;
 import com.ryanair.task2.domain.model.Schedule;
 import com.ryanair.task2.dto.api.ScheduleApiDTO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,6 +32,7 @@ class ScheduleServiceImplTest {
         scheduleServiceImpl = new ScheduleServiceImpl(scheduleDataSource);
     }
 
+    @DisplayName("Test for ScheduleServiceImpl.getSchedulesFromItinerary")
     @Test
     void testGetSchedulesFromItinerary() {
         when(scheduleDataSource.getSchedules(3, "A", "B", 2025, 1))
@@ -54,7 +56,7 @@ class ScheduleServiceImplTest {
         assertEquals(expectedResult, result);
     }
 
-    ScheduleApiDTO createScheduleApiDTO() {
+    private static ScheduleApiDTO createScheduleApiDTO() {
         return new ScheduleApiDTO(
                 1,
                 new ScheduleApiDTO.DayDTO[]{
@@ -72,6 +74,7 @@ class ScheduleServiceImplTest {
 }
 
 class ScheduleServiceUtilsTest {
+    @DisplayName("Test for ScheduleServiceUtils.checkValidItineraryTransferTime")
     @Test
     void testCheckValidTransferTime() {
         List<Schedule> validItinerarySchedules = List.of(
@@ -91,6 +94,7 @@ class ScheduleServiceUtilsTest {
         assertFalse(ScheduleServiceUtils.checkValidItineraryTransferTime(invalidItinerarySchedules, 2));
     }
 
+    @DisplayName("Test for ScheduleServiceUtils.checkValidDepartureAndArrivalTime")
     @Test
     void testCheckValidDepartureAndArrivalTime() {
         LocalDateTime departureTime = LocalDateTime.of(2024, 1, 1, 0, 0);
@@ -106,6 +110,7 @@ class ScheduleServiceUtilsTest {
         invalidSchedules.forEach(schedule -> assertFalse(ScheduleServiceUtils.checkValidDepartureAndArrivalTime(schedule, departureTime, arrivalTime)));
     }
 
+    @DisplayName("Test for ScheduleServiceUtils.computeLegSchedules")
     @Test
     void testComputeLegSchedules() {
         Schedule schedule1 = new Schedule(LocalDateTime.now(), LocalDateTime.now());
@@ -145,6 +150,7 @@ class ScheduleServiceUtilsTest {
         assertEquals(expectedResult, result);
     }
 
+    @DisplayName("Test for ScheduleServiceUtils.getItinerarySteps")
     @Test
     void testGetItinerarySteps() {
         List<String> itinerary = List.of("A", "B", "C", "D");

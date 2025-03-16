@@ -6,6 +6,7 @@ import com.ryanair.task2.datasource.RouteDataSource;
 import com.ryanair.task2.domain.model.RouteGraphNode;
 import com.ryanair.task2.dto.api.RouteApiDTO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,9 +19,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,12 +36,11 @@ class RouteServiceImplTest {
     @BeforeEach
     void setUp() {
         routeGraphCache = Caffeine.newBuilder()
-                .expireAfterWrite(30, TimeUnit.MINUTES)
-                .maximumSize(100)
                 .build();
         routeServiceImpl = new RouteServiceImpl(routeDataSource, routeGraphCache);
     }
 
+    @DisplayName("Test for RouteServiceImpl.checkIsValidRoute")
     @Test
     void testCheckIsValidRoute() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method checkIsValidRouteMethod = RouteServiceImpl.class.getDeclaredMethod("checkIsValidRoute", RouteApiDTO.class, String.class);
@@ -68,9 +68,10 @@ class RouteServiceImplTest {
         }
     }
 
+    @DisplayName("Test for RouteServiceImpl.loadRouteGraph")
     @Test
     void testLoadRouteGraph() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        when(routeDataSource.getRoutes(3)).thenReturn(routeDataSourceGetRoutesResponse());
+        when(routeDataSource.getRoutes(anyInt())).thenReturn(routeDataSourceGetRoutesResponse());
 
         Method loadRouteGraphMethod = RouteServiceImpl.class.getDeclaredMethod("loadRouteGraph", String.class);
 
@@ -101,9 +102,10 @@ class RouteServiceImplTest {
         });
     }
 
+    @DisplayName("Test for RouteServiceImpl.getRouteGraphs, verifying cache")
     @Test
     void testGetRouteGraphsCache() {
-        when(routeDataSource.getRoutes(3)).thenReturn(routeDataSourceGetRoutesResponse());
+        when(routeDataSource.getRoutes(anyInt())).thenReturn(routeDataSourceGetRoutesResponse());
 
         assertEquals(0, routeGraphCache.estimatedSize());
 
@@ -111,27 +113,28 @@ class RouteServiceImplTest {
 
         assertNotNull(routeGraphCache.getIfPresent("O1"));
 
-        routeGraphCache.put("O1", getRouteGraph());
+        routeGraphCache.put("O1", createRouteGraph());
 
         assertSame(routeServiceImpl.getRouteGraphs("O1").block(), routeGraphCache.getIfPresent("O1"));
     }
 
+    @DisplayName("Test for RouteServiceImpl.getItineraries")
     @Test
     void testGetItineraries() {
-        when(routeDataSource.getRoutes(3)).thenReturn(routeDataSourceGetRoutesResponse());
+        when(routeDataSource.getRoutes(anyInt())).thenReturn(routeDataSourceGetRoutesResponse());
 
         Flux<List<String>> itineraries = routeServiceImpl.getItineraries("A", "F", 1, "O1");
 
 
         StepVerifier.FirstStep<List<String>> verifier = StepVerifier.create(itineraries);
 
-        getRouteGraph().get("A").getItineraries("F", 1)
+        createRouteGraph().get("A").getItineraries("F", 1)
                 .forEach(verifier::expectNext);
 
         verifier.verifyComplete();
     }
 
-    private static Map<String, RouteGraphNode> getRouteGraph() {
+    private static Map<String, RouteGraphNode> createRouteGraph() {
         RouteGraphNode nodeA = new RouteGraphNode("A");
         RouteGraphNode nodeB = new RouteGraphNode("B");
         RouteGraphNode nodeC = new RouteGraphNode("C");
