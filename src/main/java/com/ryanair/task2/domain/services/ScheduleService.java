@@ -10,10 +10,10 @@ public interface ScheduleService {
     /**
      * Get schedules from an itinerary
      *
-     * @param itinerary list of airport codes in the itinerary
-     * @param departureTime departure time
-     * @param arrivalTime arrival time
-     * @param transferTime transfer time between flights
+     * @param  itinerary list of airport codes in the itinerary
+     * @param  departureTime departure time
+     * @param  arrivalTime arrival time
+     * @param  transferTime transfer time between flights
      * @return list of schedules
      */
     Flux<List<Schedule>> getSchedulesFromItinerary(List<String> itinerary, LocalDateTime departureTime, LocalDateTime arrivalTime, int transferTime);

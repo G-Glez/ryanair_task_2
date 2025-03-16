@@ -39,6 +39,12 @@ public class FlightServiceImpl implements FlightService {
                 .flatMapMany(Flux::fromIterable);
     }
 
+    /**
+     * Get the legs of an itinerary from the list of airports and the list of schedules
+     * @param itinerary list of airports
+     * @param schedules list of schedules
+     * @return          interconnection
+     */
     private InterconnectionDTO.LegDTO[] getLegs(List<String> itinerary, List<Schedule> schedules) {
         return IntStream.range(0, itinerary.size() - 1).mapToObj(
                 i -> new InterconnectionDTO.LegDTO(

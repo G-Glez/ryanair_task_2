@@ -32,7 +32,7 @@ public class RouteServiceImpl implements RouteService {
      * Every route that has a null airportFrom or airportTo is also filtered as it is not a valid route
      *
      * @param validOperator valid flight operator
-     * @return route graph
+     * @return              route graph
      */
     private Mono<Map<String, RouteGraphNode>> loadRouteGraph(String validOperator) {
         final int LOCALE = 3;
@@ -49,7 +49,7 @@ public class RouteServiceImpl implements RouteService {
      *
      * @param route         route to check
      * @param validOperator valid flight operator
-     * @return true if the route is valid, false otherwise
+     * @return              true if the route is valid, false otherwise
      */
     private boolean checkIsValidRoute(RouteApiDTO route, String validOperator) {
         return Objects.isNull(route.connectingAirport()) &&

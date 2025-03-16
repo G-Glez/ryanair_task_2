@@ -11,7 +11,7 @@ public interface RouteDataSource {
      * Get all routes
      *
      * @param locale locale
-     * @return all RouteApiDTO as a flux
+     * @return       all RouteApiDTO as a flux
      */
     Flux<RouteApiDTO> getRoutes(int locale);
 }

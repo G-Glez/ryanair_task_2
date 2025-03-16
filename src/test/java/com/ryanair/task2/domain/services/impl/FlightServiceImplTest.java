@@ -47,11 +47,11 @@ class FlightServiceImplTest {
                 .thenReturn(Flux.fromIterable(createSchedules()));
 
         List<InterconnectionDTO> expectedResult = List.of(
-                new InterconnectionDTO(2, new InterconnectionDTO.LegDTO[]{
+                new InterconnectionDTO(1, new InterconnectionDTO.LegDTO[]{
                         new InterconnectionDTO.LegDTO("A", "B", UTIL_DATE_TIME, UTIL_DATE_TIME),
                         new InterconnectionDTO.LegDTO("B", "C", UTIL_DATE_TIME, UTIL_DATE_TIME)
                 }),
-                new InterconnectionDTO(2, new InterconnectionDTO.LegDTO[]{
+                new InterconnectionDTO(1, new InterconnectionDTO.LegDTO[]{
                         new InterconnectionDTO.LegDTO("A", "B", UTIL_DATE_TIME, UTIL_DATE_TIME),
                         new InterconnectionDTO.LegDTO("B", "C", UTIL_DATE_TIME, UTIL_DATE_TIME)
                 })
