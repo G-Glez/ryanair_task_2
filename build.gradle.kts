@@ -36,6 +36,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito:mockito-core:5.16.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
     testImplementation("io.projectreactor:reactor-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
