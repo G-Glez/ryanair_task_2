@@ -1,10 +1,9 @@
-package com.ryanair.task2.domain.services;
+package com.ryanair.task2.domain.services.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.ryanair.task2.datasource.RouteDataSource;
 import com.ryanair.task2.domain.model.RouteGraphNode;
-import com.ryanair.task2.domain.services.impl.RouteServiceImpl;
 import com.ryanair.task2.dto.api.RouteApiDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class RouteServiceImplTest {
     @Mock
     private RouteDataSource routeDataSource;
 
-    Cache<String, Map<String, RouteGraphNode>> routeGraphCache;
+    private Cache<String, Map<String, RouteGraphNode>> routeGraphCache;
 
     private RouteServiceImpl routeServiceImpl;
 

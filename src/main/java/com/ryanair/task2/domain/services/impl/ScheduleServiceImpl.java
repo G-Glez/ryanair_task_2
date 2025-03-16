@@ -30,7 +30,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .flatMap(step -> potentialSchedulesByStep(step, departureTime, arrivalTime).collectList())
                 .buffer()
                 .flatMap(schedulesBySteps -> Flux.fromStream(ScheduleServiceUtils.computeLegSchedules(schedulesBySteps).stream()
-                        .filter(schedules -> ScheduleServiceUtils.checkValidTransferTime(schedules, transferTime))));
+                        .filter(schedules -> ScheduleServiceUtils.checkValidItineraryTransferTime(schedules, transferTime))));
     }
 
     private Flux<Schedule> potentialSchedulesByStep(List<String> step, LocalDateTime departureTime, LocalDateTime arrivalTime) {
@@ -45,14 +45,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 }
 
-final class ScheduleServiceUtils {
-    public static boolean checkValidTransferTime(List<Schedule> schedules, int transferTime) {
+class ScheduleServiceUtils {
+    public static boolean checkValidItineraryTransferTime(List<Schedule> schedules, int transferTime) {
         return IntStream.range(0, schedules.size() - 1)
                 .allMatch(i -> schedules.get(i).getArrivalTime().plusHours(transferTime).isBefore(schedules.get(i + 1).getDepartureTime()));
     }
 
-    public static boolean checkValidDepartureAndArrivalTime(
-            Schedule schedules, LocalDateTime departureTime, LocalDateTime arrivalTime) {
+    public static boolean checkValidDepartureAndArrivalTime(Schedule schedules, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         return schedules.getDepartureTime().isAfter(departureTime) && schedules.getArrivalTime().isBefore(arrivalTime);
     }
 
@@ -62,7 +61,6 @@ final class ScheduleServiceUtils {
         }
 
         return computeLegSchedules(potentialSchedules, 0)
-                .filter(schedules -> ScheduleServiceUtils.checkValidTransferTime(schedules, 2))
                 .toList();
     }
 
