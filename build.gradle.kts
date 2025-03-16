@@ -24,6 +24,7 @@ repositories {
 }
 
 val caffeineVersion = "3.2.0"
+val mockitoVersion = "5.16.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -36,8 +37,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:5.16.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.16.0")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
     testImplementation("io.projectreactor:reactor-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
