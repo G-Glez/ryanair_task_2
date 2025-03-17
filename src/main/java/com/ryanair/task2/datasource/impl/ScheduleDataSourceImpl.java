@@ -36,6 +36,8 @@ public class ScheduleDataSourceImpl implements ScheduleDataSource {
                         status -> status.is4xxClientError() || status.is5xxServerError(),
                         clientResponse -> Mono.error(new RemoteErrorException(REQUEST_ERROR_MESSAGE, HttpStatus.SERVICE_UNAVAILABLE)))
                 .bodyToMono(ScheduleApiDTO.class)
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)).filter(RemoteErrorException.class::isInstance));
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
+                        .filter(RemoteErrorException.class::isInstance)
+                        .onRetryExhaustedThrow(((retryBackoffSpec, retrySignal) -> retrySignal.failure())));
     }
 }

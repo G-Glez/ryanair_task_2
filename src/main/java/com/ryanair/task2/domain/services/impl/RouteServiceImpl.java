@@ -6,6 +6,7 @@ import com.ryanair.task2.domain.mappers.Mappers;
 import com.ryanair.task2.domain.model.RouteGraphNode;
 import com.ryanair.task2.domain.services.RouteService;
 import com.ryanair.task2.dto.api.RouteApiDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class RouteServiceImpl implements RouteService {
 
@@ -32,7 +34,7 @@ public class RouteServiceImpl implements RouteService {
      * Every route that has a null airportFrom or airportTo is also filtered as it is not a valid route
      *
      * @param validOperator valid flight operator
-     * @return              route graph
+     * @return route graph
      */
     private Mono<Map<String, RouteGraphNode>> loadRouteGraph(String validOperator) {
         final int LOCALE = 3;
@@ -49,13 +51,18 @@ public class RouteServiceImpl implements RouteService {
      *
      * @param route         route to check
      * @param validOperator valid flight operator
-     * @return              true if the route is valid, false otherwise
+     * @return true if the route is valid, false otherwise
      */
     private boolean checkIsValidRoute(RouteApiDTO route, String validOperator) {
+        boolean isAirportFromOrAirportToNull = Objects.nonNull(route.airportFrom()) && Objects.nonNull(route.airportTo());
+
+        if(!isAirportFromOrAirportToNull) {
+            log.warn("Route with null airportFrom or airportTo: {}", route);
+        }
+
         return Objects.isNull(route.connectingAirport()) &&
                 route.operator().toUpperCase().trim().equals(validOperator) &&
-                Objects.nonNull(route.airportFrom()) &&
-                Objects.nonNull(route.airportTo());
+                isAirportFromOrAirportToNull;
     }
 
     @Override

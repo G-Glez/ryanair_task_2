@@ -5,6 +5,7 @@ import com.ryanair.task2.domain.mappers.Mappers;
 import com.ryanair.task2.domain.model.Schedule;
 import com.ryanair.task2.domain.services.ScheduleService;
 import com.ryanair.task2.util.DateUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleDataSource scheduleDataSource;
@@ -73,13 +75,17 @@ public class ScheduleServiceImpl implements ScheduleService {
      * Check if the departure and arrival time of a schedule are valid
      * Arrival time must be before the arrival time and departure time must be after the departure time
      *
-     * @param schedules     schedule
+     * @param schedule     schedule
      * @param departureTime departure time
      * @param arrivalTime   arrival time
      * @return              true if the departure and arrival time are valid, false otherwise
      */
-    public static boolean checkValidDepartureAndArrivalTime(Schedule schedules, LocalDateTime departureTime, LocalDateTime arrivalTime) {
-        return schedules.getDepartureTime().isAfter(departureTime) && schedules.getArrivalTime().isBefore(arrivalTime);
+    public static boolean checkValidDepartureAndArrivalTime(Schedule schedule, LocalDateTime departureTime, LocalDateTime arrivalTime) {
+        if(schedule.getDepartureTime() == null || schedule.getArrivalTime() == null) {
+            log.warn("Schedule with null departureTime or arrivalTime: {}", schedule);
+            return false;
+        }
+        return schedule.getDepartureTime().isAfter(departureTime) && schedule.getArrivalTime().isBefore(arrivalTime);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.ryanair.task2.datasource.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ryanair.task2.datasource.exceptions.RemoteErrorException;
 import com.ryanair.task2.dto.api.RouteApiDTO;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -88,7 +89,7 @@ class RouteDataSourceImplTest {
         Flux<RouteApiDTO> response = routeDataSource.getRoutes(0);
 
         StepVerifier.create(response)
-                .expectError()
+                .expectError(RemoteErrorException.class)
                 .verify();
     }
 }
