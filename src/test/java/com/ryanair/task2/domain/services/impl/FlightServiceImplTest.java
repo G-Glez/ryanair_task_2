@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 class FlightServiceImplTest {
     static final LocalDateTime UTIL_DATE_TIME = LocalDateTime.of(2021, 1, 1, 0, 0);

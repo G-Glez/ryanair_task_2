@@ -6,6 +6,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 @Service
 public class ScheduleDataSourceImpl implements ScheduleDataSource {
@@ -27,6 +30,6 @@ public class ScheduleDataSourceImpl implements ScheduleDataSource {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(ScheduleApiDTO.class)
-                .retry(3);
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)));
     }
 }

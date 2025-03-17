@@ -28,7 +28,6 @@ The project build the response consuming the Ryanair API, and then filtering the
 
 `Main` branch is the version completed up to the deadline date. There are some improvements that could be done:
 
-- Add MockWebServer to test the external API calls (the retry mechanism for example)
 - Add test for controller layer
 - Add logs in critical points of the code (in this case, the external API calls)
 - Add a better error handling mechanism for errors. In this use case, errors surely comes from the external API availability.
