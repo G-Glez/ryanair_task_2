@@ -2,6 +2,7 @@ package com.ryanair.task2.datasource.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ryanair.task2.datasource.exceptions.RemoteErrorException;
 import com.ryanair.task2.dto.api.ScheduleApiDTO;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -13,13 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +38,7 @@ class ScheduleDataSourceImplTest {
     static void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
+
 
     @Mock
     private WebClient.Builder webClientBuilder;
@@ -54,30 +57,35 @@ class ScheduleDataSourceImplTest {
     }
 
     @Test
-    void checkRetry() throws JsonProcessingException {
+    void checkValidRetry() throws JsonProcessingException {
         ScheduleApiDTO mockServerResponse = new ScheduleApiDTO(2, new ScheduleApiDTO.DayDTO[]{});
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+
         mockWebServer.enqueue(new MockResponse()
                 .setBody(objectMapper.writeValueAsString(mockServerResponse))
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
 
-        StepVerifier.create(scheduleDataSource.getSchedules(0, "", "", 0, 0))
+        Mono<ScheduleApiDTO> response = scheduleDataSource.getSchedules(0, "", "", 0, 0);
+
+        StepVerifier.create(response)
                 .expectNext(mockServerResponse)
                 .verifyComplete();
+    }
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString(mockServerResponse))
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
+    @Test
+    void checkInvalidRetry() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 
-        StepVerifier.create(scheduleDataSource.getSchedules(0, "", "", 0, 0))
-                .expectError()
+        Mono<ScheduleApiDTO> response = scheduleDataSource.getSchedules(0, "", "", 0, 0);
+
+        StepVerifier.create(response)
+                .expectError(RemoteErrorException.class)
                 .verify();
     }
 }

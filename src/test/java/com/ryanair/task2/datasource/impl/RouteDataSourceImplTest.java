@@ -13,8 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
@@ -55,31 +58,36 @@ class RouteDataSourceImplTest {
     }
 
     @Test
-    void checkRetry() throws JsonProcessingException {
+    void checkValidRetry() throws JsonProcessingException {
         List<RouteApiDTO> mockServerResponse = List.of(
                 new RouteApiDTO("", "", "", false, false, "", "")
         );
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+
         mockWebServer.enqueue(new MockResponse()
                 .setBody(objectMapper.writeValueAsString(mockServerResponse))
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
 
-        StepVerifier.create(routeDataSource.getRoutes(0))
+        Flux<RouteApiDTO> response = routeDataSource.getRoutes(0);
+
+        StepVerifier.create(response)
                 .expectNext(mockServerResponse.getFirst())
                 .verifyComplete();
+    }
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString(mockServerResponse))
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
+    @Test
+    void checkInvalidRetry() {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 
-        StepVerifier.create(routeDataSource.getRoutes(3))
+        Flux<RouteApiDTO> response = routeDataSource.getRoutes(0);
+
+        StepVerifier.create(response)
                 .expectError()
                 .verify();
     }
