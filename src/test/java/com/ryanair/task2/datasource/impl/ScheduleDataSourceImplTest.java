@@ -6,10 +6,7 @@ import com.ryanair.task2.datasource.exceptions.RemoteErrorException;
 import com.ryanair.task2.dto.api.ScheduleApiDTO;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,7 +36,6 @@ class ScheduleDataSourceImplTest {
         mockWebServer.shutdown();
     }
 
-
     @Mock
     private WebClient.Builder webClientBuilder;
 
@@ -56,27 +52,34 @@ class ScheduleDataSourceImplTest {
         scheduleDataSource = new ScheduleDataSourceImpl(webClientBuilder);
     }
 
+    @DisplayName("Check retries with 3 failed requests and 1 successful request")
     @Test
     void checkValidRetry() throws JsonProcessingException {
+        // Server response
         ScheduleApiDTO mockServerResponse = new ScheduleApiDTO(2, new ScheduleApiDTO.DayDTO[]{});
 
+        // 3 server failed responses before the successful response
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 
+        // Successful server response
         mockWebServer.enqueue(new MockResponse()
                 .setBody(objectMapper.writeValueAsString(mockServerResponse))
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
 
         Mono<ScheduleApiDTO> response = scheduleDataSource.getSchedules(0, "", "", 0, 0);
 
+        // Expect the successful response
         StepVerifier.create(response)
                 .expectNext(mockServerResponse)
                 .verifyComplete();
     }
 
+    @DisplayName("Check retries with 4 failed requests")
     @Test
     void checkInvalidRetry() {
+        // 4 server failed responses
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
@@ -84,6 +87,7 @@ class ScheduleDataSourceImplTest {
 
         Mono<ScheduleApiDTO> response = scheduleDataSource.getSchedules(0, "", "", 0, 0);
 
+        // Expect an error
         StepVerifier.create(response)
                 .expectError(RemoteErrorException.class)
                 .verify();

@@ -18,6 +18,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,10 +37,7 @@ class ScheduleServiceImplTest {
     @DisplayName("Test for ScheduleServiceImpl.getSchedulesFromItinerary")
     @Test
     void testGetSchedulesFromItinerary() {
-        when(scheduleDataSource.getSchedules(3, "A", "B", 2025, 1))
-                .thenReturn(Mono.just(createScheduleApiDTO()));
-
-        when(scheduleDataSource.getSchedules(3, "B", "C", 2025, 1))
+        when(scheduleDataSource.getSchedules(anyInt(), anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(createScheduleApiDTO()));
 
         List<List<Schedule>> expectedResult = List.of(
@@ -48,10 +47,13 @@ class ScheduleServiceImplTest {
                 )
         );
 
-        List<List<Schedule>> result = scheduleServiceImpl.getSchedulesFromItinerary(List.of("A", "B", "C"), LocalDateTime.of(2025, 1, 1, 0, 0), LocalDateTime.of(2025, 1, 2, 10, 0), 2)
+        List<List<Schedule>> result = scheduleServiceImpl.getSchedulesFromItinerary(
+                        List.of("A", "B", "C"), // itinerary
+                        LocalDateTime.of(2025, 1, 1, 0, 0), // departureTime
+                        LocalDateTime.of(2025, 1, 2, 10, 0),  // arrivalTime
+                        2) // transferTime
                 .collectList()
                 .block();
-
 
         assertEquals(expectedResult, result);
     }
@@ -97,7 +99,9 @@ class ScheduleServiceImplTest {
     void testCheckValidDepartureAndArrivalTime() {
         LocalDateTime departureTime = LocalDateTime.of(2024, 1, 1, 0, 0);
         LocalDateTime arrivalTime = LocalDateTime.of(2024, 1, 1, 10, 0);
+
         Schedule validSchedule = new Schedule(departureTime.plus(Duration.ofHours(2)), arrivalTime.minus(Duration.ofHours(2)));
+
         List<Schedule> invalidSchedules = List.of(
                 new Schedule(departureTime.minus(Duration.ofHours(2)), arrivalTime.minus(Duration.ofHours(2))),
                 new Schedule(departureTime.plus(Duration.ofHours(2)), arrivalTime.plus(Duration.ofHours(2))),
@@ -116,32 +120,23 @@ class ScheduleServiceImplTest {
         Schedule schedule3 = new Schedule(LocalDateTime.now(), LocalDateTime.now());
         Schedule schedule4 = new Schedule(LocalDateTime.now(), LocalDateTime.now());
 
-
+        // Two potential schedules for each leg
         List<List<Schedule>> potentialSchedules = List.of(
-                List.of(
-                        schedule1,
-                        schedule2
-                ),
-                List.of(
-                        schedule3,
-                        schedule4
-                )
-        );
+                List.of(schedule1,
+                        schedule2),
+                List.of(schedule3,
+                        schedule4));
 
+        // Cartesian product, every possible combination of schedules
         List<List<Schedule>> expectedResult = List.of(
-                List.of(
-                        schedule1,
+                List.of(schedule1,
                         schedule3),
-                List.of(
-                        schedule1,
+                List.of(schedule1,
                         schedule4),
-                List.of(
-                        schedule2,
+                List.of(schedule2,
                         schedule3),
-                List.of(
-                        schedule2,
-                        schedule4)
-        );
+                List.of(schedule2,
+                        schedule4));
 
         List<List<Schedule>> result = ScheduleServiceImpl.computeLegSchedules(potentialSchedules);
 

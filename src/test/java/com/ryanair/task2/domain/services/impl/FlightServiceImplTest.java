@@ -67,12 +67,9 @@ class FlightServiceImplTest {
 
     private static List<List<Schedule>> createSchedules() {
         return List.of(
-                List.of(
-                        new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME),
+                List.of(new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME),
                         new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME)),
-                List.of(
-                        new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME),
-                        new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME))
-        );
+                List.of(new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME),
+                        new Schedule(UTIL_DATE_TIME, UTIL_DATE_TIME)));
     }
 }

@@ -15,7 +15,7 @@ public interface ScheduleDataSource {
      * @param arrival   arrival
      * @param year      year
      * @param month     month
-     * @return          ScheduleApiDTO as a mono
+     * @return ScheduleApiDTO as a mono
      */
     Mono<ScheduleApiDTO> getSchedules(int timetable, String departure, String arrival, int year, int month);
 }

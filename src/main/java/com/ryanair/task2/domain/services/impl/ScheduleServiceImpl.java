@@ -43,7 +43,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      * @param step          list of airport codes in the step (2 elements)
      * @param departureTime departure time
      * @param arrivalTime   arrival time
-     * @return              flux of potential schedules
+     * @return flux of potential schedules
      */
     private Flux<Schedule> potentialSchedulesByStep(List<String> step, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         final int TIMETABLE = 3;
@@ -64,7 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      *
      * @param schedules    list of schedules
      * @param transferTime transfer time between flights
-     * @return             true if the transfer time is valid, false otherwise
+     * @return true if the transfer time is valid, false otherwise
      */
     public static boolean checkValidItineraryTransferTime(List<Schedule> schedules, int transferTime) {
         return IntStream.range(0, schedules.size() - 1)
@@ -75,13 +75,13 @@ public class ScheduleServiceImpl implements ScheduleService {
      * Check if the departure and arrival time of a schedule are valid
      * Arrival time must be before the arrival time and departure time must be after the departure time
      *
-     * @param schedule     schedule
+     * @param schedule      schedule
      * @param departureTime departure time
      * @param arrivalTime   arrival time
-     * @return              true if the departure and arrival time are valid, false otherwise
+     * @return true if the departure and arrival time are valid, false otherwise
      */
     public static boolean checkValidDepartureAndArrivalTime(Schedule schedule, LocalDateTime departureTime, LocalDateTime arrivalTime) {
-        if(schedule.getDepartureTime() == null || schedule.getArrivalTime() == null) {
+        if (schedule.getDepartureTime() == null || schedule.getArrivalTime() == null) {
             log.warn("Schedule with null departureTime or arrivalTime: {}", schedule);
             return false;
         }
@@ -93,7 +93,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      * This possible schedules are calculated as the cartesian product of the schedules of the step
      *
      * @param potentialSchedules list of schedules for an itinerary
-     * @return                   list of possible schedules
+     * @return list of possible schedules
      */
     public static List<List<Schedule>> computeLegSchedules(List<List<Schedule>> potentialSchedules) {
         if (potentialSchedules.isEmpty()) {
@@ -116,15 +116,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                                     List<Schedule> newList = new ArrayList<>(list);
                                     newList.addFirst(element);
                                     return newList;
-                                })
-                );
+                                }));
     }
 
     /**
      * Get the steps of an itinerary
      *
      * @param itinerary list of airport codes in the itinerary
-     * @return          list of steps
+     * @return list of steps
      */
     public static List<List<String>> getItinerarySteps(List<String> itinerary) {
         return IntStream

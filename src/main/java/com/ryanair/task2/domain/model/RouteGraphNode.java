@@ -19,10 +19,10 @@ public class RouteGraphNode {
      *
      * @param arrivalAirportIATACode The arrival airport IATA code
      * @param maxStops               The maximum number of stops
-     * @return                       A list of itineraries
+     * @return A list of itineraries
      */
     public List<List<String>> getItineraries(String arrivalAirportIATACode, int maxStops) {
-        if(airportIATACode.equals(arrivalAirportIATACode)) {
+        if (airportIATACode.equals(arrivalAirportIATACode)) {
             return Collections.emptyList();
         }
 

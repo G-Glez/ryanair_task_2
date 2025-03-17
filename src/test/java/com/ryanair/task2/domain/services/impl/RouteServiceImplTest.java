@@ -118,6 +118,18 @@ class RouteServiceImplTest {
         assertSame(routeServiceImpl.getRouteGraphs("O1").block(), routeGraphCache.getIfPresent("O1"));
     }
 
+    @DisplayName("Test for RouteServiceImpl.getRouteGraphs, verifying cache does not cache errors")
+    @Test
+    void testGetRouteGraphsCacheError() {
+        when(routeDataSource.getRoutes(anyInt())).thenReturn(Flux.error(new RuntimeException()));
+
+        assertEquals(0, routeGraphCache.estimatedSize());
+
+        routeServiceImpl.getRouteGraphs("O1").onErrorResume(e -> Mono.empty()).block();
+
+        assertEquals(0, routeGraphCache.estimatedSize());
+    }
+
     @DisplayName("Test for RouteServiceImpl.getItineraries")
     @Test
     void testGetItineraries() {
@@ -158,8 +170,7 @@ class RouteServiceImplTest {
 
     private static Flux<RouteApiDTO> routeDataSourceGetRoutesResponse() {
         return Flux.fromIterable(
-                List.of(
-                        new RouteApiDTO("A", "B", null, true, true, "O1", ""),
+                List.of(new RouteApiDTO("A", "B", null, true, true, "O1", ""),
                         new RouteApiDTO("A", "C", null, true, true, "O1", ""),
                         new RouteApiDTO("A", "D", null, true, true, "O1", ""),
                         new RouteApiDTO("A", "E", null, true, true, "O1", ""),
@@ -171,8 +182,7 @@ class RouteServiceImplTest {
                         new RouteApiDTO("E", "A", null, true, true, "O1", ""),
                         new RouteApiDTO("E", "C", null, true, true, "O1", ""),
                         new RouteApiDTO("E", "D", null, true, true, "O1", ""),
-                        new RouteApiDTO("E", "F", null, true, true, "O1", "")
-                )
+                        new RouteApiDTO("E", "F", null, true, true, "O1", ""))
         );
     }
 }

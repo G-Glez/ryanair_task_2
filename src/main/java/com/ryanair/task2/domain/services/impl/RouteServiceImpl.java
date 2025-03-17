@@ -56,7 +56,7 @@ public class RouteServiceImpl implements RouteService {
     private boolean checkIsValidRoute(RouteApiDTO route, String validOperator) {
         boolean isAirportFromOrAirportToNull = Objects.nonNull(route.airportFrom()) && Objects.nonNull(route.airportTo());
 
-        if(!isAirportFromOrAirportToNull) {
+        if (!isAirportFromOrAirportToNull) {
             log.warn("Route with null airportFrom or airportTo: {}", route);
         }
 

@@ -26,11 +26,12 @@ repositories {
 val caffeineVersion = "3.2.0"
 val mockitoVersion = "5.16.0"
 val mockWebServerVersion = "4.12.0"
-val slf4jVersion = "1.7.25"
+val slf4jVersion = "2.0.17"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
+
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
 
     compileOnly("org.projectlombok:lombok")

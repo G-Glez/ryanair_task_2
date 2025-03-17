@@ -94,10 +94,12 @@ class MappersTests {
     @DisplayName("Test for Mappers.scheduleApiDTOToSchedule with an empty list of schedules as input")
     @Test
     void testScheduleApiDTOToScheduleWithEmptyFlights() {
+        // Schedule with no flights
         ScheduleApiDTO scheduleApiDTO = new ScheduleApiDTO(5, new ScheduleApiDTO.DayDTO[0]);
 
         List<Schedule> schedules = Mappers.scheduleApiDTOToSchedule(scheduleApiDTO, 2023);
 
+        // Expect an empty list
         assertTrue(schedules.isEmpty());
     }
 }

@@ -13,5 +13,5 @@ external-api:
   responseTimeout: 1000 # in milliseconds
 
 cache:
-    expiration: 30 # in minutes
-    maxSize: 100
+  expiration: 30 # in minutes
+  maxSize: 100
